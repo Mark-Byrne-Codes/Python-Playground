@@ -1,2 +1,3 @@
-# Wordle-Python
-Wordle with Python
+### Wordle
+
+Trying to make both a wordle game and solver in python.
