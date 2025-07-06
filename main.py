@@ -1,7 +1,6 @@
 import random
 import os
-from typing import List, Tuple
-from enum import Enum
+from typing import List
 
 def load_word_list(filename: str = "words.txt") -> List[str]:
     """Load word list from a text file."""
@@ -21,57 +20,90 @@ def load_word_list(filename: str = "words.txt") -> List[str]:
         return five_letter_words
     except FileNotFoundError:
         # Fallback word list if file is missing
-        print("⚠️  Warning: words.txt not found, using fallback word list")
-        return ['which', 'their', 'would', 'there', 'could', 'other', 'about', 
-                'great', 'these', 'after', 'first', 'never', 'where', 'those',
-                'shall', 'being', 'might', 'every', 'think', 'under', 'found',
-                'still', 'while', 'again', 'place', 'young', 'years', 'three',
-                'right', 'house', 'whole', 'world', 'thing', 'night', 'going',
-                'heard', 'heart', 'among', 'asked', 'small', 'woman', 'whose',
-                'quite', 'words', 'given', 'taken', 'hands', 'until', 'since', 'light']
+        print("⚠️  Using fallback word list")
+        return ['apple', 'beach', 'crane', 'dance', 'earth', 'fairy', 'grape', 
+                'house', 'igloo', 'jelly', 'koala', 'lemon', 'mango', 'night',
+                'olive', 'peach', 'queen', 'radio', 'sunny', 'tiger', 'umbra',
+                'vivid', 'whale', 'xenon', 'yacht', 'zebra', 'about', 'below',
+                'crisp', 'dwarf', 'elbow', 'flint', 'globe', 'honey', 'inbox',
+                'jumpy', 'kneel', 'lucky', 'mirth', 'noble', 'oxide', 'piano']
 
-# Load word list at module level
 word_list = load_word_list()
 
-# ANSI color codes
 class Colors:
     """ANSI color codes for terminal output."""
-    # Background colors
-    GREEN_BG = '\033[42m'    # Green background
-    YELLOW_BG = '\033[43m'   # Yellow background  
-    RED_BG = '\033[41m'      # Red background
-    
-    # Text colors
-    WHITE = '\033[97m'       # White text
-    BLACK = '\033[30m'       # Black text
-    GRAY = '\033[90m'        # Gray text for borders
-    
-    # Reset
-    RESET = '\033[0m'        # Reset all formatting
-
-
-class Difficulty(Enum):
-    EASY = 1
-    HARD = 2
-    SUPER_HARD = 3
-
+    GREEN = '\033[42m\033[97m'  # Green background, white text
+    YELLOW = '\033[43m\033[30m' # Yellow background, black text
+    GRAY = '\033[100m\033[97m'   # Gray background, white text
+    RESET = '\033[0m'            # Reset all formatting
 
 class WordleGame:
-    print(word_list)
-
+    WORD_LENGTH = 5
+    MAX_ATTEMPTS = 6
+    
+    def __init__(self):
+        self.secret_word = random.choice(word_list)
+        self.attempts = []
+    
+    def get_feedback(self, guess: str) -> str:
+        """Generate colored feedback for the guessed word"""
+        feedback = []
+        secret_temp = list(self.secret_word)
+        
+        # First pass: check correct positions (green)
+        for i in range(self.WORD_LENGTH):
+            if guess[i] == secret_temp[i]:
+                feedback.append(f"{Colors.GREEN} {guess[i].upper()} {Colors.RESET}")
+                secret_temp[i] = None
+            else:
+                feedback.append("")
+        
+        # Second pass: check remaining letters (yellow/gray)
+        for i in range(self.WORD_LENGTH):
+            if not feedback[i]:
+                if guess[i] in secret_temp:
+                    feedback[i] = f"{Colors.YELLOW} {guess[i].upper()} {Colors.RESET}"
+                    secret_temp[secret_temp.index(guess[i])] = None
+                else:
+                    feedback[i] = f"{Colors.GRAY} {guess[i].upper()} {Colors.RESET}"
+        
+        return " ".join(feedback)
+    
+    def play(self):
+        print("\nWelcome to Wordle!")
+        print(f"Guess the {self.WORD_LENGTH}-letter word. You have {self.MAX_ATTEMPTS} tries.\n")
+        
+        while len(self.attempts) < self.MAX_ATTEMPTS:
+            # Show previous attempts
+            for attempt in self.attempts:
+                print(attempt)
+            
+            # Get new guess
+            guess = input(f"Attempt {len(self.attempts)+1}/{self.MAX_ATTEMPTS}: ").lower()
+            
+            if len(guess) != self.WORD_LENGTH or not guess.isalpha():
+                print(f"Please enter a {self.WORD_LENGTH}-letter word\n")
+                continue
+                
+            feedback = self.get_feedback(guess)
+            self.attempts.append(feedback)
+            print()  # Blank line for spacing
+            
+            if guess == self.secret_word:
+                print(f"🎉 Correct! The word was {self.secret_word.upper()}")
+                print(f"Solved in {len(self.attempts)} tries!")
+                return
+        
+        print(f"💔 Game over! The word was: {self.secret_word.upper()}")
 
 def main():
-    """Entry point for the game."""
-    game = WordleGame()
-
+    while True:
+        game = WordleGame()
+        game.play()
+        
+        if input("\nPlay again? (y/n): ").lower() != 'y':
+            print("Thanks for playing!")
+            break
 
 if __name__ == "__main__":
     main()
-
-
-
-
-
-
-
-
