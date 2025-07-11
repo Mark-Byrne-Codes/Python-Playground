@@ -10,7 +10,8 @@ sys.path.insert(0, games_dir)
 try:
     from Wordle import WordleGame
     from Pig import PigGame
-    print("✅ Successfully imported WordleGame and PigGame")
+    from Superpower import SuperpowerGame
+    print("✅ Successfully imported WordleGame, PigGame, and SuperpowerGame")
 except ImportError as e:
     print(f"❌ Import error: {e}")
     print(f"Games directory: {games_dir}")
@@ -26,6 +27,7 @@ def main_menu():
         print("="*40)
         print("1 - Play Wordle")
         print("2 - Play Pig")
+        print("3 - Superpower Generator")
         print("Q - Quit")
         print("="*40)
 
@@ -47,6 +49,14 @@ def main_menu():
                 print("\nReturning to main menu.")
             except Exception as e:
                 print(f"❌ Error starting Pig: {e}")
+        elif choice == '3':
+            print("\nStarting Superpower Generator...")
+            try:
+                superpower_game = SuperpowerGame()
+                superpower_game.play()
+                print("\nReturning to main menu.")
+            except Exception as e:
+                print(f"❌ Error starting Superpower Generator: {e}")
         elif choice == 'q':
             print("\n👋 Thanks for playing! Goodbye!")
             break
